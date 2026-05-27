@@ -5,11 +5,24 @@ import { useAuth } from "../context/AuthContext";
 export default function ProtectedRoute({
   children,
 }) {
-  const { user } = useAuth();
 
-  if (!user) {
-    return <Navigate to="/login" />;
+  const {
+    user,
+    loading,
+  } = useAuth();
+
+  // Wait for auth check
+  if (loading) {
+    return <p>Loading...</p>;
   }
 
+  // Not logged in
+  if (!user) {
+    return (
+      <Navigate to="/login" />
+    );
+  }
+
+  // Logged in
   return children;
 }

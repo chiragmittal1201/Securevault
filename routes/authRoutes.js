@@ -14,38 +14,54 @@ const router = express.Router();
 
 router.post("/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const {
+      username,
+      email,
+      password,
+    } = req.body;
 
     // Validation
-    if (!username || !email || !password) {
+    if (
+      !username ||
+      !email ||
+      !password
+    ) {
       return res.status(400).json({
-        message: "All fields are required",
+        message:
+          "All fields are required",
       });
     }
 
     // Password length
     if (password.length < 6) {
       return res.status(400).json({
-        message: "Password must be at least 6 characters",
+        message:
+          "Password must be at least 6 characters",
       });
     }
 
     // Existing user check
-    const existingUser = await User.findOne({ email });
+    const existingUser =
+      await User.findOne({
+        email,
+      });
 
     if (existingUser) {
       return res.status(400).json({
-        message: "User already exists",
+        message:
+          "User already exists",
       });
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword =
+      await bcrypt.hash(password, 10);
 
     // Generate verification token
-    const verificationToken = crypto
-      .randomBytes(32)
-      .toString("hex");
+    const verificationToken =
+      crypto
+        .randomBytes(32)
+        .toString("hex");
 
     // Create user
     const user = await User.create({
@@ -64,6 +80,7 @@ router.post("/register", async (req, res) => {
     res.status(201).json({
       message:
         "User registered successfully. Please verify your email.",
+
       user: {
         id: user._id,
         username: user.username,
@@ -84,37 +101,48 @@ router.post("/register", async (req, res) => {
 
 // ================= VERIFY EMAIL =================
 
-router.get("/verify/:token", async (req, res) => {
-  try {
-    const { token } = req.params;
+router.get(
+  "/verify/:token",
 
-    const user = await User.findOne({
-      verificationToken: token,
-    });
+  async (req, res) => {
+    try {
 
-    if (!user) {
-      return res.status(400).json({
-        message: "Invalid verification token",
+      const { token } =
+        req.params;
+
+      const user =
+        await User.findOne({
+          verificationToken:
+            token,
+        });
+
+      if (!user) {
+        return res.status(400).json({
+          message:
+            "Invalid verification token",
+        });
+      }
+
+      user.isVerified = true;
+
+      user.verificationToken = "";
+
+      await user.save();
+
+      res.status(200).json({
+        message:
+          "Email verified successfully",
+      });
+
+    } catch (error) {
+      console.log(error);
+
+      res.status(500).json({
+        message: "Server error",
       });
     }
-
-    user.isVerified = true;
-    user.verificationToken = "";
-
-    await user.save();
-
-    res.status(200).json({
-      message: "Email verified successfully",
-    });
-
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      message: "Server error",
-    });
   }
-});
+);
 
 
 
@@ -122,40 +150,55 @@ router.get("/verify/:token", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+
+    const {
+      email,
+      password,
+    } = req.body;
 
     // Validation
-    if (!email || !password) {
+    if (
+      !email ||
+      !password
+    ) {
       return res.status(400).json({
-        message: "All fields are required",
+        message:
+          "All fields are required",
       });
     }
 
     // Find user
-    const user = await User.findOne({ email });
+    const user =
+      await User.findOne({
+        email,
+      });
 
     if (!user) {
       return res.status(400).json({
-        message: "Invalid credentials",
+        message:
+          "Invalid credentials",
       });
     }
 
     // Email verification check
     if (!user.isVerified) {
       return res.status(401).json({
-        message: "Please verify your email first",
+        message:
+          "Please verify your email first",
       });
     }
 
     // Compare password
-    const isMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isMatch =
+      await bcrypt.compare(
+        password,
+        user.password
+      );
 
     if (!isMatch) {
       return res.status(400).json({
-        message: "Invalid credentials",
+        message:
+          "Invalid credentials",
       });
     }
 
@@ -164,7 +207,9 @@ router.post("/login", async (req, res) => {
       {
         id: user._id,
       },
+
       process.env.JWT_SECRET,
+
       {
         expiresIn: "7d",
       }
@@ -173,16 +218,27 @@ router.post("/login", async (req, res) => {
     // Send cookie
     res.cookie("token", token, {
       httpOnly: true,
+
       secure: false,
+
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+
+      maxAge:
+        7 *
+        24 *
+        60 *
+        60 *
+        1000,
     });
 
     res.status(200).json({
-      message: "Login successful",
+      message:
+        "Login successful",
+
       user: {
         id: user._id,
-        username: user.username,
+        username:
+          user.username,
         email: user.email,
       },
     });
@@ -196,14 +252,76 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+
+// ================= GET CURRENT USER =================
+
+router.get("/me", async (req, res) => {
+  try {
+
+    const token =
+      req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({
+        message:
+          "Not authenticated",
+      });
+    }
+
+    // Verify token
+    const decoded =
+      jwt.verify(
+        token,
+        process.env.JWT_SECRET
+      );
+
+    // Find user
+    const user =
+      await User.findById(
+        decoded.id
+      ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        message:
+          "User not found",
+      });
+    }
+
+    res.status(200).json({
+      user: {
+        id: user._id,
+        username:
+          user.username,
+        email: user.email,
+      },
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    res.status(401).json({
+      message:
+        "Invalid token",
+    });
+  }
+});
+
+
+
 // ================= LOGOUT =================
 
 router.post("/logout", (req, res) => {
+
   res.clearCookie("token");
 
   res.status(200).json({
-    message: "Logout successful",
+    message:
+      "Logout successful",
   });
 });
+
+
 
 export default router;

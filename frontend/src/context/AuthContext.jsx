@@ -1,22 +1,66 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
 } from "react";
 
-const AuthContext = createContext();
+import axios from "axios";
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+const AuthContext =
+  createContext();
 
-  const [cryptoKey, setCryptoKey] =
+export function AuthProvider({
+  children,
+}) {
+
+  const [user, setUser] =
     useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  // ================= CHECK AUTH =================
+
+  useEffect(() => {
+
+    const checkAuth =
+      async () => {
+        try {
+
+          const response =
+            await axios.get(
+              "http://localhost:5000/auth/me",
+
+              {
+                withCredentials: true,
+              }
+            );
+
+          setUser(
+            response.data.user
+          );
+
+        } catch (error) {
+
+          setUser(null);
+
+        } finally {
+
+          setLoading(false);
+        }
+      };
+
+    checkAuth();
+
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        setUser
+        setUser,
+        loading,
       }}
     >
       {children}
@@ -25,5 +69,7 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  return useContext(
+    AuthContext
+  );
 }

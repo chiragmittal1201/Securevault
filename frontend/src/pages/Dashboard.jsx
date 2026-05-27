@@ -24,6 +24,11 @@ export default function Dashboard() {
   const [loading, setLoading] =
     useState(false);
 
+  const [
+    confirmDeleteId,
+    setConfirmDeleteId,
+  ] = useState(null);
+
   // ================= FETCH NOTES =================
 
   const fetchNotes = async () => {
@@ -249,7 +254,7 @@ export default function Dashboard() {
 
           <button
             onClick={() =>
-              handleDeleteNote(
+              setConfirmDeleteId(
                 note._id
               )
             }
@@ -259,6 +264,90 @@ export default function Dashboard() {
 
         </div>
       ))}
+
+
+
+      {/* DELETE CONFIRMATION MODAL */}
+
+      {confirmDeleteId && (
+        <div
+          style={{
+            position: "fixed",
+
+            top: 0,
+            left: 0,
+
+            width: "100%",
+            height: "100%",
+
+            background:
+              "rgba(0,0,0,0.5)",
+
+            display: "flex",
+
+            justifyContent:
+              "center",
+
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+
+              padding: "30px",
+
+              borderRadius: "10px",
+
+              width: "300px",
+            }}
+          >
+            <h3>
+              Delete Note?
+            </h3>
+
+            <p>
+              This action cannot be
+              undone.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+
+                gap: "10px",
+
+                marginTop: "20px",
+              }}
+            >
+              <button
+                onClick={() => {
+
+                  handleDeleteNote(
+                    confirmDeleteId
+                  );
+
+                  setConfirmDeleteId(
+                    null
+                  );
+                }}
+              >
+                Yes, Delete
+              </button>
+
+              <button
+                onClick={() =>
+                  setConfirmDeleteId(
+                    null
+                  )
+                }
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
