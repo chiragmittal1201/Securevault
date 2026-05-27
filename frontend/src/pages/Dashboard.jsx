@@ -29,6 +29,11 @@ export default function Dashboard() {
     setConfirmDeleteId,
   ] = useState(null);
 
+  const [
+    editingNoteId,
+    setEditingNoteId,
+  ] = useState(null);
+
   // ================= FETCH NOTES =================
 
   const fetchNotes = async () => {
@@ -56,30 +61,56 @@ export default function Dashboard() {
     fetchNotes();
   }, []);
 
-  // ================= CREATE NOTE =================
+  // ================= CREATE / UPDATE NOTE =================
 
-  const handleCreateNote = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
 
       setLoading(true);
 
-      await axios.post(
-        "http://localhost:5000/notes",
+      // ================= EDIT MODE =================
 
-        {
-          title,
-          content,
-        },
+      if (editingNoteId) {
 
-        {
-          withCredentials: true,
-        }
-      );
+        await axios.put(
+          `http://localhost:5000/notes/${editingNoteId}`,
 
+          {
+            title,
+            content,
+          },
+
+          {
+            withCredentials: true,
+          }
+        );
+
+      } else {
+
+        // ================= CREATE MODE =================
+
+        await axios.post(
+          "http://localhost:5000/notes",
+
+          {
+            title,
+            content,
+          },
+
+          {
+            withCredentials: true,
+          }
+        );
+      }
+
+      // Reset form
       setTitle("");
+
       setContent("");
+
+      setEditingNoteId(null);
 
       fetchNotes();
 
@@ -89,6 +120,35 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // ================= EDIT NOTE =================
+
+  const handleEditNote = (note) => {
+
+    setEditingNoteId(
+      note._id
+    );
+
+    setTitle(note.title);
+
+    setContent(note.content);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  // ================= CANCEL EDIT =================
+
+  const handleCancelEdit = () => {
+
+    setEditingNoteId(null);
+
+    setTitle("");
+
+    setContent("");
   };
 
   // ================= DELETE NOTE =================
@@ -168,9 +228,9 @@ export default function Dashboard() {
 
 
 
-      {/* CREATE NOTE */}
+      {/* CREATE / EDIT NOTE */}
 
-      <form onSubmit={handleCreateNote}>
+      <form onSubmit={handleSubmit}>
 
         <input
           type="text"
@@ -202,9 +262,33 @@ export default function Dashboard() {
           disabled={loading}
         >
           {loading
-            ? "Saving..."
-            : "Create Note"}
+            ? (
+              editingNoteId
+                ? "Updating..."
+                : "Saving..."
+            )
+            : (
+              editingNoteId
+                ? "Update Note"
+                : "Create Note"
+            )}
         </button>
+
+        {editingNoteId && (
+          <>
+            {" "}
+
+            <button
+              type="button"
+
+              onClick={
+                handleCancelEdit
+              }
+            >
+              Cancel Edit
+            </button>
+          </>
+        )}
 
       </form>
 
@@ -252,15 +336,34 @@ export default function Dashboard() {
           <br />
           <br />
 
-          <button
-            onClick={() =>
-              setConfirmDeleteId(
-                note._id
-              )
-            }
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+            }}
           >
-            Delete
-          </button>
+
+            <button
+              onClick={() =>
+                handleEditNote(
+                  note
+                )
+              }
+            >
+              Edit
+            </button>
+
+            <button
+              onClick={() =>
+                setConfirmDeleteId(
+                  note._id
+                )
+              }
+            >
+              Delete
+            </button>
+
+          </div>
 
         </div>
       ))}

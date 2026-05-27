@@ -1,6 +1,7 @@
 import express from "express";
 
 import Note from "../models/Note.js";
+
 import protect from "../middleware/authMiddleware.js";
 
 import {
@@ -16,12 +17,17 @@ const router = express.Router();
 
 router.post("/", protect, async (req, res) => {
   try {
-    const { title, content } = req.body;
+
+    const {
+      title,
+      content,
+    } = req.body;
 
     // Validation
     if (!title || !content) {
       return res.status(400).json({
-        message: "Missing required fields",
+        message:
+          "Missing required fields",
       });
     }
 
@@ -59,11 +65,14 @@ router.post("/", protect, async (req, res) => {
     });
 
     res.status(201).json({
-      message: "Note created successfully",
+      message:
+        "Note created successfully",
+
       note,
     });
 
   } catch (error) {
+
     console.log(error);
 
     res.status(500).json({
@@ -78,6 +87,7 @@ router.post("/", protect, async (req, res) => {
 
 router.get("/", protect, async (req, res) => {
   try {
+
     const notes = await Note.find({
       userId: req.user.id,
     }).sort({
@@ -85,8 +95,8 @@ router.get("/", protect, async (req, res) => {
     });
 
     // Decrypt notes
-    const decryptedNotes = notes.map(
-      (note) => ({
+    const decryptedNotes =
+      notes.map((note) => ({
         _id: note._id,
 
         title: decrypt(
@@ -101,15 +111,16 @@ router.get("/", protect, async (req, res) => {
           note.contentAuthTag
         ),
 
-        createdAt: note.createdAt,
-      })
-    );
+        createdAt:
+          note.createdAt,
+      }));
 
     res.status(200).json(
       decryptedNotes
     );
 
   } catch (error) {
+
     console.log(error);
 
     res.status(500).json({
@@ -120,22 +131,114 @@ router.get("/", protect, async (req, res) => {
 
 
 
-// ================= DELETE NOTE =================
+// ================= UPDATE NOTE =================
 
-router.delete(
+router.put(
   "/:id",
+
   protect,
+
   async (req, res) => {
     try {
+
+      const {
+        title,
+        content,
+      } = req.body;
+
+      // Validation
+      if (!title || !content) {
+        return res.status(400).json({
+          message:
+            "Missing required fields",
+        });
+      }
+
+      // Find note
       const note =
         await Note.findOne({
           _id: req.params.id,
-          userId: req.user.id,
+
+          userId:
+            req.user.id,
         });
 
       if (!note) {
         return res.status(404).json({
-          message: "Note not found",
+          message:
+            "Note not found",
+        });
+      }
+
+      // Encrypt updated title
+      const encryptedTitleData =
+        encrypt(title);
+
+      // Encrypt updated content
+      const encryptedContentData =
+        encrypt(content);
+
+      // Update note
+      note.encryptedTitle =
+        encryptedTitleData.encryptedContent;
+
+      note.titleIv =
+        encryptedTitleData.iv;
+
+      note.titleAuthTag =
+        encryptedTitleData.authTag;
+
+      note.encryptedContent =
+        encryptedContentData.encryptedContent;
+
+      note.contentIv =
+        encryptedContentData.iv;
+
+      note.contentAuthTag =
+        encryptedContentData.authTag;
+
+      await note.save();
+
+      res.status(200).json({
+        message:
+          "Note updated successfully",
+      });
+
+    } catch (error) {
+
+      console.log(error);
+
+      res.status(500).json({
+        message: "Server error",
+      });
+    }
+  }
+);
+
+
+
+// ================= DELETE NOTE =================
+
+router.delete(
+  "/:id",
+
+  protect,
+
+  async (req, res) => {
+    try {
+
+      const note =
+        await Note.findOne({
+          _id: req.params.id,
+
+          userId:
+            req.user.id,
+        });
+
+      if (!note) {
+        return res.status(404).json({
+          message:
+            "Note not found",
         });
       }
 
@@ -147,6 +250,7 @@ router.delete(
       });
 
     } catch (error) {
+
       console.log(error);
 
       res.status(500).json({

@@ -7,15 +7,13 @@ import {
   Link,
 } from "react-router-dom";
 
-import { useAuth } from "../context/AuthContext";
-
-export default function Login() {
+export default function Register() {
 
   const navigate =
     useNavigate();
 
-  const { setUser } =
-    useAuth();
+  const [username, setUsername] =
+    useState("");
 
   const [email, setEmail] =
     useState("");
@@ -26,7 +24,7 @@ export default function Login() {
   const [loading, setLoading] =
     useState(false);
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
@@ -35,25 +33,20 @@ export default function Login() {
 
       const response =
         await axios.post(
-          "http://localhost:5000/auth/login",
+          "http://localhost:5000/auth/register",
 
           {
+            username,
             email,
             password,
-          },
-
-          {
-            withCredentials: true,
           }
         );
 
-      // Store user
-      setUser(
-        response.data.user
+      alert(
+        response.data.message
       );
 
-      // Redirect
-      navigate("/dashboard");
+      navigate("/login");
 
     } catch (error) {
 
@@ -62,7 +55,7 @@ export default function Login() {
       alert(
         error.response?.data
           ?.message ||
-          "Login failed"
+          "Registration failed"
       );
 
     } finally {
@@ -78,12 +71,28 @@ export default function Login() {
       }}
     >
       <h1>
-        Login
+        Register
       </h1>
 
       <form
-        onSubmit={handleLogin}
+        onSubmit={
+          handleRegister
+        }
       >
+
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) =>
+            setUsername(
+              e.target.value
+            )
+          }
+        />
+
+        <br />
+        <br />
 
         <input
           type="email"
@@ -118,8 +127,8 @@ export default function Login() {
           disabled={loading}
         >
           {loading
-            ? "Logging in..."
-            : "Login"}
+            ? "Registering..."
+            : "Register"}
         </button>
 
       </form>
@@ -127,10 +136,11 @@ export default function Login() {
       <br />
 
       <p>
-        Don't have an account?{" "}
+        Already have an
+        account?{" "}
 
-        <Link to="/register">
-          Register
+        <Link to="/login">
+          Login
         </Link>
       </p>
     </div>
