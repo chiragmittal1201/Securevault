@@ -7,6 +7,8 @@ import {
   Link,
 } from "react-router-dom";
 
+import "../styles/auth.css";
+
 export default function Register() {
 
   const navigate =
@@ -24,6 +26,12 @@ export default function Register() {
   const [loading, setLoading] =
     useState(false);
 
+  const [success, setSuccess] =
+    useState(false);
+
+  const [errorMessage, setErrorMessage] =
+    useState("");
+
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -31,31 +39,27 @@ export default function Register() {
 
       setLoading(true);
 
-      const response =
-        await axios.post(
-          "http://localhost:5000/auth/register",
+      setErrorMessage("");
 
-          {
-            username,
-            email,
-            password,
-          }
-        );
+      await axios.post(
+        "http://localhost:5000/auth/register",
 
-      alert(
-        response.data.message
+        {
+          username,
+          email,
+          password,
+        }
       );
 
-      navigate("/login");
+      setSuccess(true);
 
     } catch (error) {
 
       console.log(error);
 
-      alert(
-        error.response?.data
-          ?.message ||
-          "Registration failed"
+      setErrorMessage(
+        error.response?.data?.message ||
+        "Registration failed"
       );
 
     } finally {
@@ -64,85 +68,175 @@ export default function Register() {
     }
   };
 
+  // ================= SUCCESS STATE =================
+
+if (success) {
   return (
-    <div
-      style={{
-        padding: "40px",
-      }}
-    >
-      <h1>
-        Register
-      </h1>
+    <div className="auth-page">
 
-      <form
-        onSubmit={
-          handleRegister
-        }
-      >
+      <div className="auth-card verification-card">
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) =>
-            setUsername(
-              e.target.value
-            )
+        <div className="verification-badge">
+          ✓
+        </div>
+
+        <h1 className="auth-title">
+          Verify Your Email
+        </h1>
+
+        <p className="verification-text">
+          Your SecureVault account
+          has been created successfully.
+        </p>
+
+        <div className="verification-email">
+          {email}
+        </div>
+
+        <p className="verification-helper">
+          We sent a verification link
+          to your email address.
+          <br />
+          Please verify your account
+          before logging in.
+        </p>
+
+        <p className="verification-small">
+          If you don't see the email,
+          check your spam or promotions
+          folder.
+        </p>
+
+        <div className="verification-actions">
+
+          <button
+            className="auth-button"
+
+            onClick={() =>
+              navigate("/login")
+            }
+          >
+            Go to Login
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+  // ================= REGISTER FORM =================
+
+  return (
+    <div className="auth-page">
+
+      <div className="auth-card">
+
+        <h1 className="auth-title">
+          Create Account
+        </h1>
+
+        <p className="auth-subtitle">
+          Your peaceful and secure
+          note space begins here.
+        </p>
+
+        <form
+          className="auth-form"
+
+          onSubmit={
+            handleRegister
           }
-        />
-
-        <br />
-        <br />
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) =>
-            setEmail(
-              e.target.value
-            )
-          }
-        />
-
-        <br />
-        <br />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(
-              e.target.value
-            )
-          }
-        />
-
-        <br />
-        <br />
-
-        <button
-          type="submit"
-          disabled={loading}
         >
-          {loading
-            ? "Registering..."
-            : "Register"}
-        </button>
 
-      </form>
+          <input
+            className="auth-input"
 
-      <br />
+            type="text"
 
-      <p>
-        Already have an
-        account?{" "}
+            placeholder="Username"
 
-        <Link to="/login">
-          Login
-        </Link>
-      </p>
+            value={username}
+
+            onChange={(e) =>
+              setUsername(
+                e.target.value
+              )
+            }
+          />
+
+          <input
+            className="auth-input"
+
+            type="email"
+
+            placeholder="Email"
+
+            value={email}
+
+            onChange={(e) =>
+              setEmail(
+                e.target.value
+              )
+            }
+          />
+
+          <input
+            className="auth-input"
+
+            type="password"
+
+            placeholder="Password"
+
+            value={password}
+
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+          />
+
+          {errorMessage && (
+            <div
+              className="auth-error"
+            >
+              {errorMessage}
+            </div>
+          )}
+
+          <button
+            className="auth-button"
+
+            type="submit"
+
+            disabled={loading}
+          >
+            {loading
+              ? "Creating account..."
+              : "Register"}
+          </button>
+
+        </form>
+
+        <div className="auth-footer">
+
+          Already have an account?{" "}
+
+          <Link
+            to="/login"
+
+            className="auth-link"
+          >
+            Login
+          </Link>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }

@@ -9,6 +9,8 @@ import {
 
 import { useAuth } from "../context/AuthContext";
 
+import "../styles/auth.css";
+
 export default function Login() {
 
   const navigate =
@@ -72,67 +74,85 @@ export default function Login() {
   };
 
   return (
-    <div
-      style={{
-        padding: "40px",
-      }}
-    >
-      <h1>
-        Login
-      </h1>
+    <div className="auth-page">
 
-      <form
-        onSubmit={handleLogin}
-      >
+      <div className="auth-card">
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) =>
-            setEmail(
-              e.target.value
-            )
-          }
-        />
+        <h1 className="auth-title">
+          Welcome Back
+        </h1>
 
-        <br />
-        <br />
+        <p className="auth-subtitle">
+          Secure your thoughts in a
+          calm and private space.
+        </p>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(
-              e.target.value
-            )
-          }
-        />
+        <form
+          className="auth-form"
 
-        <br />
-        <br />
-
-        <button
-          type="submit"
-          disabled={loading}
+          onSubmit={handleLogin}
         >
-          {loading
-            ? "Logging in..."
-            : "Login"}
-        </button>
 
-      </form>
+          <input
+            className="auth-input"
 
-      <br />
+            type="email"
 
-      <p>
-        Don't have an account?{" "}
+            placeholder="Email"
 
-        <Link to="/register">
-          Register
-        </Link>
-      </p>
+            value={email}
+
+            onChange={(e) =>
+              setEmail(
+                e.target.value
+              )
+            }
+          />
+
+          <input
+            className="auth-input"
+
+            type="password"
+
+            placeholder="Password"
+
+            value={password}
+
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+          />
+
+          <button
+            className="auth-button"
+
+            type="submit"
+
+            disabled={loading}
+          >
+            {loading
+              ? "Logging in..."
+              : "Login"}
+          </button>
+
+        </form>
+
+        <div className="auth-footer">
+          Don't have an account?{" "}
+
+          <Link
+            to="/register"
+
+            className="auth-link"
+          >
+            Register
+          </Link>
+        </div>
+
+      </div>
+
     </div>
   );
 }

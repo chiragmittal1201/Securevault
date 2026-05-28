@@ -129,10 +129,9 @@ router.get(
 
       await user.save();
 
-      res.status(200).json({
-        message:
-          "Email verified successfully",
-      });
+      return res.redirect(
+        "http://localhost:5173/verified-success"
+      );
 
     } catch (error) {
       console.log(error);

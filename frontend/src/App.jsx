@@ -11,17 +11,21 @@ import Register from "./pages/Register";
 
 import Dashboard from "./pages/Dashboard";
 
+import VerificationSuccess from "./pages/VerificationSuccess";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
         {/* ================= LOGIN ================= */}
 
         <Route
           path="/login"
+
           element={<Login />}
         />
 
@@ -31,7 +35,20 @@ function App() {
 
         <Route
           path="/register"
+
           element={<Register />}
+        />
+
+
+
+        {/* ================= EMAIL VERIFIED ================= */}
+
+        <Route
+          path="/verified-success"
+
+          element={
+            <VerificationSuccess />
+          }
         />
 
 
@@ -40,9 +57,12 @@ function App() {
 
         <Route
           path="/dashboard"
+
           element={
             <ProtectedRoute>
+
               <Dashboard />
+
             </ProtectedRoute>
           }
         />
@@ -53,6 +73,7 @@ function App() {
 
         <Route
           path="*"
+
           element={
             <Navigate
               to="/dashboard"
@@ -61,6 +82,7 @@ function App() {
         />
 
       </Routes>
+
     </BrowserRouter>
   );
 }

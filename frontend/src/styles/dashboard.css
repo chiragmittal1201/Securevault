@@ -1,0 +1,147 @@
+.dashboard-page {
+  min-height: 100vh;
+  padding: 40px;
+  background: linear-gradient(
+    to bottom,
+    #bfe9ff 0%,
+    #6ec6ff 45%,
+    #f5e6ca 100%
+  );
+  color: #12344d;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-title {
+  font-size: 3rem;
+  color: #0f3d5e;
+}
+
+.primary-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 14px;
+  background: #0d5ea8;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary-button:hover {
+  background: #084b87;
+}
+
+.note-form {
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 30px;
+  margin-bottom: 40px;
+  max-width: 700px;
+}
+
+.note-input,
+.note-textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.8);
+}
+
+.note-textarea {
+  min-height: 180px;
+  resize: vertical;
+}
+
+.notes-heading {
+  margin-bottom: 24px;
+  font-size: 2rem;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap: 24px;
+}
+
+.note-card {
+  background: rgba(255,248,235,0.9);
+  padding: 24px;
+  border-radius: 24px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.note-title {
+  margin-bottom: 12px;
+  color: #12405f;
+}
+
+.note-content {
+  margin-bottom: 18px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.note-date {
+  font-size: 0.85rem;
+  color: #567286;
+}
+
+.note-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.edit-button {
+  background: #1f8b6d;
+}
+
+.edit-button:hover {
+  background: #166b53;
+}
+
+.delete-button {
+  background: #c74a4a;
+}
+
+.delete-button:hover {
+  background: #a73535;
+}
+
+.empty-notes {
+  background: rgba(255,255,255,0.2);
+  padding: 30px;
+  border-radius: 24px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-card {
+  background: #fff8ef;
+  padding: 30px;
+  border-radius: 24px;
+  width: 320px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}

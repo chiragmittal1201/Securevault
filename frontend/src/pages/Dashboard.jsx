@@ -6,11 +6,15 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 
+import "../styles/dashboard.css";
+
 export default function Dashboard() {
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const { setUser } = useAuth();
+  const { setUser } =
+    useAuth();
 
   const [notes, setNotes] =
     useState([]);
@@ -51,6 +55,7 @@ export default function Dashboard() {
       setNotes(response.data);
 
     } catch (error) {
+
       console.log(error);
     }
   };
@@ -61,7 +66,7 @@ export default function Dashboard() {
     fetchNotes();
   }, []);
 
-  // ================= CREATE / UPDATE NOTE =================
+  // ================= CREATE / UPDATE =================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,8 +75,7 @@ export default function Dashboard() {
 
       setLoading(true);
 
-      // ================= EDIT MODE =================
-
+      // EDIT MODE
       if (editingNoteId) {
 
         await axios.put(
@@ -89,8 +93,7 @@ export default function Dashboard() {
 
       } else {
 
-        // ================= CREATE MODE =================
-
+        // CREATE MODE
         await axios.post(
           "http://localhost:5000/notes",
 
@@ -105,7 +108,7 @@ export default function Dashboard() {
         );
       }
 
-      // Reset form
+      // Reset
       setTitle("");
 
       setContent("");
@@ -115,9 +118,11 @@ export default function Dashboard() {
       fetchNotes();
 
     } catch (error) {
+
       console.log(error);
 
     } finally {
+
       setLoading(false);
     }
   };
@@ -169,6 +174,7 @@ export default function Dashboard() {
       fetchNotes();
 
     } catch (error) {
+
       console.log(error);
     }
   };
@@ -193,237 +199,216 @@ export default function Dashboard() {
       navigate("/login");
 
     } catch (error) {
+
       console.log(error);
     }
   };
 
   return (
-    <div
-      style={{
-        padding: "40px",
-      }}
-    >
+    <div className="dashboard-page">
 
-      {/* HEADER */}
+      {/* ================= HEADER ================= */}
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent:
-            "space-between",
+      <div className="dashboard-header">
 
-          alignItems: "center",
-        }}
-      >
-        <h1>
-          SecureVault Dashboard
+        <h1 className="dashboard-title">
+          SecureVault
         </h1>
 
         <button
+          className="primary-button"
+
           onClick={handleLogout}
         >
           Logout
         </button>
+
       </div>
 
 
 
-      {/* CREATE / EDIT NOTE */}
+      {/* ================= FORM ================= */}
 
-      <form onSubmit={handleSubmit}>
+      <form
+        className="note-form"
+
+        onSubmit={handleSubmit}
+      >
 
         <input
+          className="note-input"
+
           type="text"
+
           placeholder="Note title"
+
           value={title}
+
           onChange={(e) =>
-            setTitle(e.target.value)
+            setTitle(
+              e.target.value
+            )
           }
         />
-
-        <br />
-        <br />
 
         <textarea
-          rows="8"
-          cols="40"
-          placeholder="Write secure note..."
+          className="note-textarea"
+
+          placeholder="Write your peaceful thoughts here..."
+
           value={content}
+
           onChange={(e) =>
-            setContent(e.target.value)
+            setContent(
+              e.target.value
+            )
           }
         />
 
-        <br />
-        <br />
-
-        <button
-          type="submit"
-          disabled={loading}
+        <div
+          style={{
+            display: "flex",
+            gap: "12px",
+          }}
         >
-          {loading
-            ? (
-              editingNoteId
-                ? "Updating..."
-                : "Saving..."
-            )
-            : (
-              editingNoteId
-                ? "Update Note"
-                : "Create Note"
-            )}
-        </button>
 
-        {editingNoteId && (
-          <>
-            {" "}
+          <button
+            className="primary-button"
 
+            type="submit"
+
+            disabled={loading}
+          >
+            {loading
+              ? (
+                editingNoteId
+                  ? "Updating..."
+                  : "Saving..."
+              )
+              : (
+                editingNoteId
+                  ? "Update Note"
+                  : "Create Note"
+              )}
+          </button>
+
+          {editingNoteId && (
             <button
               type="button"
+
+              className="primary-button delete-button"
 
               onClick={
                 handleCancelEdit
               }
             >
-              Cancel Edit
+              Cancel
             </button>
-          </>
-        )}
+          )}
+
+        </div>
 
       </form>
 
-      <hr
-        style={{
-          margin: "40px 0",
-        }}
-      />
 
 
+      {/* ================= NOTES ================= */}
 
-      {/* NOTES */}
+      <h2 className="notes-heading">
+        Your Notes
+      </h2>
 
-      <h2>Your Notes</h2>
+      {notes.length === 0 ? (
 
-      {notes.length === 0 && (
-        <p>No notes found</p>
-      )}
+        <div className="empty-notes">
+          No notes yet.
+          Start writing something calm.
+        </div>
 
-      {notes.map((note) => (
-        <div
-          key={note._id}
+      ) : (
 
-          style={{
-            border: "1px solid #ccc",
+        <div className="notes-grid">
 
-            padding: "20px",
+          {notes.map((note) => (
 
-            marginBottom: "20px",
+            <div
+              key={note._id}
 
-            borderRadius: "10px",
-          }}
-        >
-
-          <h3>{note.title}</h3>
-
-          <p>{note.content}</p>
-
-          <small>
-            {new Date(
-              note.createdAt
-            ).toLocaleString()}
-          </small>
-
-          <br />
-          <br />
-
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-            }}
-          >
-
-            <button
-              onClick={() =>
-                handleEditNote(
-                  note
-                )
-              }
+              className="note-card"
             >
-              Edit
-            </button>
 
-            <button
-              onClick={() =>
-                setConfirmDeleteId(
-                  note._id
-                )
-              }
-            >
-              Delete
-            </button>
+              <h3 className="note-title">
+                {note.title}
+              </h3>
 
-          </div>
+              <p className="note-content">
+                {note.content}
+              </p>
+
+              <small className="note-date">
+                {new Date(
+                  note.createdAt
+                ).toLocaleString()}
+              </small>
+
+              <div className="note-actions">
+
+                <button
+                  className="primary-button edit-button"
+
+                  onClick={() =>
+                    handleEditNote(
+                      note
+                    )
+                  }
+                >
+                  Edit
+                </button>
+
+                <button
+                  className="primary-button delete-button"
+
+                  onClick={() =>
+                    setConfirmDeleteId(
+                      note._id
+                    )
+                  }
+                >
+                  Delete
+                </button>
+
+              </div>
+
+            </div>
+          ))}
 
         </div>
-      ))}
+      )}
 
 
 
-      {/* DELETE CONFIRMATION MODAL */}
+      {/* ================= DELETE MODAL ================= */}
 
       {confirmDeleteId && (
-        <div
-          style={{
-            position: "fixed",
 
-            top: 0,
-            left: 0,
+        <div className="modal-overlay">
 
-            width: "100%",
-            height: "100%",
+          <div className="modal-card">
 
-            background:
-              "rgba(0,0,0,0.5)",
-
-            display: "flex",
-
-            justifyContent:
-              "center",
-
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-
-              padding: "30px",
-
-              borderRadius: "10px",
-
-              width: "300px",
-            }}
-          >
-            <h3>
+            <h3 className="modal-title">
               Delete Note?
             </h3>
 
-            <p>
+            <p className="modal-text">
               This action cannot be
               undone.
             </p>
 
-            <div
-              style={{
-                display: "flex",
+            <div className="modal-actions">
 
-                gap: "10px",
-
-                marginTop: "20px",
-              }}
-            >
               <button
+                className="primary-button delete-button"
+
                 onClick={() => {
 
                   handleDeleteNote(
@@ -439,6 +424,8 @@ export default function Dashboard() {
               </button>
 
               <button
+                className="primary-button"
+
                 onClick={() =>
                   setConfirmDeleteId(
                     null
@@ -447,8 +434,11 @@ export default function Dashboard() {
               >
                 Cancel
               </button>
+
             </div>
+
           </div>
+
         </div>
       )}
 
