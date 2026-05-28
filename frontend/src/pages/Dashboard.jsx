@@ -28,6 +28,9 @@ export default function Dashboard() {
   const [loading, setLoading] =
     useState(false);
 
+  const [notesLoading, setNotesLoading] =
+    useState(true);
+
   const [
     confirmDeleteId,
     setConfirmDeleteId,
@@ -43,6 +46,8 @@ export default function Dashboard() {
   const fetchNotes = async () => {
     try {
 
+      setNotesLoading(true);
+
       const response =
         await axios.get(
           "http://localhost:5000/notes",
@@ -57,6 +62,10 @@ export default function Dashboard() {
     } catch (error) {
 
       console.log(error);
+
+    } finally {
+
+      setNotesLoading(false);
     }
   };
 
@@ -108,7 +117,7 @@ export default function Dashboard() {
         );
       }
 
-      // Reset
+      // RESET
       setTitle("");
 
       setContent("");
@@ -318,11 +327,36 @@ export default function Dashboard() {
         Your Notes
       </h2>
 
-      {notes.length === 0 ? (
+      {notesLoading ? (
+
+        <div className="loading-notes">
+
+          <div className="loading-wave">
+            🌊
+          </div>
+
+          <p>
+            Loading your secure notes...
+          </p>
+
+        </div>
+
+      ) : notes.length === 0 ? (
 
         <div className="empty-notes">
-          No notes yet.
-          Start writing something calm.
+
+          <div className="empty-wave">
+            🌊
+          </div>
+
+          <h3>
+            The ocean is calm today.
+          </h3>
+
+          <p>
+            Your thoughts can begin here.
+          </p>
+
         </div>
 
       ) : (
